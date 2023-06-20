@@ -124,7 +124,7 @@ const HighlightCode: Plugin = {
                 }
                 if (obj.type === "codeBlock" && supportedLangs.includes(obj.lang)) {
                     const meta = Object.keys(langList).includes(obj.lang) && langList[obj.lang][1] ? langList[obj.lang][0] : "Code"
-                    const iconURL = `https://raw.githubusercontent.com/3nm1ty/Assets/main/${meta}.png`
+                    const iconURL = `https://raw.githubusercontent.com/m4fn3/HighlightCode/master/logos/${meta}.png`
                     let embed
                     if (get(plugin_name, "small_font_size", false)) {
                         embed = {

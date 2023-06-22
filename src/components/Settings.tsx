@@ -1,5 +1,5 @@
-import {FormRow, FormSection, View, ScrollView, Image, Text, FormSwitch} from 'enmity/components'
-import {Constants, Navigation, React, StyleSheet} from 'enmity/metro/common'
+import {FormRow, FormSection, View, ScrollView, Image, Text, FormSwitch, FormInput} from 'enmity/components'
+import {Constants, Navigation, React, StyleSheet, Toasts} from 'enmity/metro/common'
 import {Linking} from "enmity/metro/common"
 // @ts-ignore
 import {name, version} from '../../manifest.json'
@@ -9,6 +9,7 @@ import {getByProps} from "enmity/modules"
 const GitHubIcon = getIDByName('img_account_sync_github_white')
 const DiscordIcon = getIDByName('Discord')
 const TwitterIcon = getIDByName('img_account_sync_twitter_white')
+const FailIcon = getIDByName('Small')
 
 const Invites = getByProps('acceptInviteAndTransitionToInviteChannel')
 
@@ -80,15 +81,31 @@ export default ({settings}) => {
                 />
                 {[1].filter(_ => settings.get("_tester")).map(() =>
                     <FormRow
-                        label="Smaller font size (require K2genmity tweak)"
+                        label="Change the font to monospace"
                         trailing={
                             <FormSwitch
-                                value={settings.getBoolean("small_font_size", false)}
+                                value={settings.getBoolean("change_font", false)}
                                 onValueChange={(value) => {
-                                    settings.set("small_font_size", value)
+                                    settings.set("change_font", value)
                                 }}
                             />
                         }
+                    />
+                )}
+                {[1].filter(_ => settings.get("_tester")).map(() =>
+                    <FormInput
+                        title="Font size of monospace"
+                        value={settings.get("font_size", 10).toString()}
+                        onSubmitEditing={(event) => {
+                            if (isNaN(event.nativeEvent.text)) {
+                                Toasts.open({
+                                    content: `You entered an invalid number`,
+                                    source: FailIcon
+                                })
+                            } else {
+                                settings.set("font_size", Number(event.nativeEvent.text))
+                            }
+                        }}
                     />
                 )}
             </FormSection>

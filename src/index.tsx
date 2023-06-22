@@ -7,7 +7,7 @@ import Settings from "./components/Settings"
 import {getByProps} from "enmity/modules"
 // @ts-ignore
 import Prism from './prismjs'
-import {get} from "enmity/api/settings";
+import {get, set} from "enmity/api/settings";
 import {getByKeyword, getByName} from "enmity/metro";
 
 const Patcher = create('HighlightCode')
@@ -71,9 +71,22 @@ const langList = {
     "objectivec": ["Objective-C", false]
 }
 
+function initVariable(name, defVal, force = false) {
+    if (force) {
+        set(plugin_name, name, defVal)
+    } else if (get(plugin_name, name) === undefined) {
+        set(plugin_name, name, defVal)
+    }
+}
+
 const HighlightCode: Plugin = {
     ...manifest,
     onStart() {
+        const metas = [["change_font", false], ["font_size", 10]]
+        metas.forEach((meta) => {
+            // @ts-ignore
+            initVariable(...meta)
+        })
 
         // const RowManager = getByName("RowManager")
         // Patcher.before(RowManager.prototype, "generate", (self, args, res) => {
@@ -126,39 +139,37 @@ const HighlightCode: Plugin = {
                     const meta = Object.keys(langList).includes(obj.lang) && langList[obj.lang][1] ? langList[obj.lang][0] : "Code"
                     const iconURL = `https://raw.githubusercontent.com/m4fn3/HighlightCode/master/logos/${meta}.png`
                     let embed
-                    if (get(plugin_name, "small_font_size", false)) {
-                        embed = {
-                            titleColor: 4294112245,
-                            borderColor: 4043309055,
-                            backgroundColor: 4281019697,
-                            thumbnailCornerRadius: 15,
-                            // embedCanBeTapped: true, acceptLabelBackgroundColor: 4283322456, acceptLabelColor: 4294967295, acceptLabelIcon: 'file://', acceptLabelText: '', badgeIcon: 'file:///', channelIcon: 'file:///', channelName: '', guildName: '', headerIcon: 'file:///',
-                            badgeCount: Object.keys(langList).includes(obj.lang) ? langList[obj.lang][0] : obj.lang,
-                            content: highlightText(obj.content, obj.lang),
-                            // titleText: '', subtitle: '',
-                            setIndex: 10,
-                            creatorAvatar: iconURL,
-                            extendedType: 1,
-                            headerColor: 4287929591,
-                            headerText: '',
-                            headerTextColor: 4290099905,
-                            isRsvped: true,
-                            type: 0
-                        }
-                    } else {
-                        embed = {
-                            type: 'rich',
-                            description: highlightText(obj.content, obj.lang),
-                            author: {
-                                name: Object.keys(langList).includes(obj.lang) ? langList[obj.lang][0] : obj.lang,
-                                iconURL: iconURL,
-                                iconProxyURL: iconURL
-                            },
-                            borderLeftColor: ReactNative.processColor("#e0e0ff"),
-                            providerColor: ReactNative.processColor("#e0e0ff"),
-                            headerTextColor: 4294967295,
-                            bodyTextColor: 4292599521
-                        }
+                    let rawContent = [{content: highlightText(obj.content, obj.lang), type: "paragraph"}, {content: "-- By CodeHighlight", type: "text"}]
+                    // embed = {
+                    //     titleColor: 4294112245,
+                    //     borderColor: 4043309055,
+                    //     backgroundColor: 4281019697,
+                    //     thumbnailCornerRadius: 15,
+                    //     // embedCanBeTapped: true, acceptLabelBackgroundColor: 4283322456, acceptLabelColor: 4294967295, acceptLabelIcon: 'file://', acceptLabelText: '', badgeIcon: 'file:///', channelIcon: 'file:///', channelName: '', guildName: '', headerIcon: 'file:///',
+                    //     badgeCount: Object.keys(langList).includes(obj.lang) ? langList[obj.lang][0] : obj.lang,
+                    //     content: rawContent,
+                    //     // titleText: '', subtitle: '',
+                    //     setIndex: 10,
+                    //     creatorAvatar: iconURL,
+                    //     extendedType: 1,
+                    //     headerColor: 4287929591,
+                    //     headerText: '',
+                    //     headerTextColor: 4290099905,
+                    //     isRsvped: true,
+                    //     type: 0
+                    // }
+                    embed = {
+                        type: 'rich',
+                        description: rawContent,
+                        author: {
+                            name: Object.keys(langList).includes(obj.lang) ? langList[obj.lang][0] : obj.lang,
+                            iconURL: iconURL,
+                            iconProxyURL: iconURL
+                        },
+                        borderLeftColor: ReactNative.processColor("#e0e0ff"),
+                        providerColor: ReactNative.processColor("#e0e0ff"),
+                        headerTextColor: 4294967295,
+                        bodyTextColor: 4292599521
                     }
                     embeds.push(embed)
                     obj.type = "text"
@@ -175,11 +186,8 @@ const HighlightCode: Plugin = {
                 if (row?.message?.content) {
                     let res = walkContent(row.message.content)
                     row.message.content = res[0]
-                    if (get(plugin_name, "small_font_size", false)) {
-                        row.message.codedLinks ? row.message.codedLinks.push(...res[1]) : row.message.codedLinks = res[1]
-                    } else {
-                        row.message.embeds ? row.message.embeds.push(...res[1]) : row.message.embeds = res[1]
-                    }
+                    // row.message.codedLinks ? row.message.codedLinks.push(...res[1]) : row.message.codedLinks = res[1]
+                    row.message.embeds ? row.message.embeds.push(...res[1]) : row.message.embeds = res[1]
                 }
                 // coloring with
                 //     row.message.content.push({

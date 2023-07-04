@@ -1,5 +1,5 @@
-import {FormRow, FormSection, View, ScrollView, Image, Text, FormSwitch, FormInput} from 'enmity/components'
-import {Constants, Navigation, React, StyleSheet, Toasts} from 'enmity/metro/common'
+import {FormRow, FormSection, View, ScrollView, Image, Text, FormSwitch, FormInput, FormLabel, FormText} from 'enmity/components'
+import {Constants, Dialog, Navigation, React, StyleSheet, Toasts} from 'enmity/metro/common'
 import {Linking} from "enmity/metro/common"
 // @ts-ignore
 import {name, version} from '../../manifest.json'
@@ -12,6 +12,19 @@ const TwitterIcon = getIDByName('img_account_sync_twitter_white')
 const FailIcon = getIDByName('Small')
 
 const Invites = getByProps('acceptInviteAndTransitionToInviteChannel')
+const K2genmityURL = "https://github.com/m4fn3/K2geLocker/blob/master/K2genmity.md#installation"
+
+function k2genmity() {
+    Dialog.show({
+        title: "HighlightCode",
+        body: "K2genmity v2.0.0 or later is required to use this feature",
+        confirmText: "Check install instructions",
+        cancelText: "Later",
+        onConfirm: () => {
+            Linking.openURL(K2genmityURL)
+        }
+    })
+}
 
 export default ({settings}) => {
     const styles = StyleSheet.createThemedStyleSheet({
@@ -79,24 +92,29 @@ export default ({settings}) => {
                         />
                     }
                 />
-                {[1].filter(_ => settings.get("_tester")).map(() =>
-                    <FormRow
-                        label="Change the font to monospace"
-                        trailing={
-                            <FormSwitch
-                                value={settings.getBoolean("change_font", false)}
-                                onValueChange={(value) => {
+            </FormSection>
+            <FormSection title="SETTINGS (K2genmtiy required)">
+                <FormRow
+                    label="Change the font to monospace"
+                    trailing={
+                        <FormSwitch
+                            value={settings.getBoolean("change_font", false)}
+                            onValueChange={(value) => {
+                                if (settings.get("_isK2genmity")) {
                                     settings.set("change_font", value)
-                                }}
-                            />
-                        }
-                    />
-                )}
-                {[1].filter(_ => settings.get("_tester")).map(() =>
-                    <FormInput
-                        title="Font size of monospace"
-                        value={settings.get("font_size", 10).toString()}
-                        onSubmitEditing={(event) => {
+                                } else {
+                                    value = false
+                                    k2genmity()
+                                }
+                            }}
+                        />
+                    }
+                />
+                <FormInput
+                    title="Font size of monospace"
+                    value={settings.get("font_size", 10).toString()}
+                    onSubmitEditing={(event) => {
+                        if (settings.get("_isK2genmity")) {
                             if (isNaN(event.nativeEvent.text)) {
                                 Toasts.open({
                                     content: `You entered an invalid number`,
@@ -105,9 +123,11 @@ export default ({settings}) => {
                             } else {
                                 settings.set("font_size", Number(event.nativeEvent.text))
                             }
-                        }}
-                    />
-                )}
+                        } else {
+                            k2genmity()
+                        }
+                    }}
+                />
             </FormSection>
             <FormSection title="INFORMATION">
                 <FormRow

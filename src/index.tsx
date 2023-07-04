@@ -9,6 +9,7 @@ import {getByProps} from "enmity/modules"
 import Prism from './prismjs'
 import {get, set} from "enmity/api/settings";
 import {getByKeyword, getByName} from "enmity/metro";
+import {sendCommand} from "../../K2geLocker/src/utils/native";
 
 const Patcher = create('HighlightCode')
 
@@ -199,6 +200,14 @@ const HighlightCode: Plugin = {
                 //     )
             }
             args[1] = JSON.stringify(rows)
+        })
+
+        set(plugin_name, "_isK2genmity", false)
+        sendCommand("K2geLocker", ["check"], (data) => {
+            set(plugin_name, "_isK2genmity", true)
+            if (data == "yes") {
+                set(plugin_name, "_hasBiometricsPerm", true)
+            }
         })
     },
     onStop() {

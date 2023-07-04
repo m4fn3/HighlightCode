@@ -12,7 +12,7 @@ const TwitterIcon = getIDByName('img_account_sync_twitter_white')
 const FailIcon = getIDByName('Small')
 
 const Invites = getByProps('acceptInviteAndTransitionToInviteChannel')
-const K2genmityURL = "https://github.com/m4fn3/K2geLocker/blob/master/K2genmity.md#installation"
+const K2genmityURL = "https://github.com/m4fn3/K2genmity/blob/master/README.md#installation"
 
 function k2genmity() {
     Dialog.show({

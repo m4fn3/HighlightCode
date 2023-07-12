@@ -93,7 +93,7 @@ export default ({settings}) => {
                     }
                 />
             </FormSection>
-            <FormSection title="SETTINGS (K2genmtiy required)">
+            <FormSection title="SETTINGS (K2genmity required)">
                 <FormRow
                     label="Change the font to monospace"
                     trailing={
